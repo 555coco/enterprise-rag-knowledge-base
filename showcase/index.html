@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Atlas Knowledge · Enterprise RAG</title>
+  <style>
+    :root { --bg:#f7f8fc; --panel:#fff; --ink:#14213d; --muted:#6b7280; --line:#e7eaf1; --blue:#3967ff; --blue-weak:#edf1ff; --green:#0d9f6e; --amber:#e99318; --shadow:0 12px 38px rgba(24,40,72,.07); }
+    * { box-sizing:border-box } body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; }
+    .shell { min-height:100vh; display:grid; grid-template-columns:244px 1fr; }
+    aside { background:#111b35; color:#d4d9e8; padding:24px 16px; display:flex; flex-direction:column; gap:24px; }
+    .brand { display:flex; align-items:center; gap:11px; padding:4px 8px; color:#fff; font-weight:750; font-size:16px; letter-spacing:.1px }
+    .brand-mark { width:30px; height:30px; border-radius:9px; display:grid; place-items:center; background:linear-gradient(135deg,#6689ff,#9f70ff); box-shadow:0 7px 20px #607cff55; font-size:16px }
+    .workspace { background:#1c2949; border:1px solid #2c3a5f; border-radius:10px; padding:11px 12px; color:#fff; font-size:13px; display:flex; justify-content:space-between }
+    .nav-label { color:#7582a2; font-size:11px; letter-spacing:.09em; padding:0 11px; text-transform:uppercase; margin:3px 0 5px }
+    nav { display:grid; gap:3px } .nav { border:0; background:transparent; color:#b9c2d8; text-align:left; padding:10px 11px; border-radius:8px; font:inherit; cursor:pointer; display:flex; align-items:center; gap:10px; }
+    .nav:hover,.nav.active { color:#fff; background:#27375f } .dot { margin-left:auto; width:7px; height:7px; background:#42d49d; border-radius:50%; box-shadow:0 0 0 3px #42d49d20 }
+    .side-bottom { margin-top:auto; border-top:1px solid #29375a; padding:17px 8px 2px; font-size:12px; color:#9ca9c5; }
+    main { max-width:1480px; width:100%; margin:auto; padding:28px 34px 48px; }
+    header { display:flex; justify-content:space-between; align-items:center; margin-bottom:27px } .crumb { color:var(--muted); font-size:13px; margin-bottom:4px } h1 { font-size:25px; line-height:1.2; margin:0; letter-spacing:-.03em } .header-actions { display:flex; gap:10px; align-items:center }
+    .pill { border:1px solid #dce3fb; background:#f7f9ff; color:#5368ae; border-radius:99px; padding:7px 10px; font-size:12px; display:flex; align-items:center; gap:7px; } .pill i { width:7px;height:7px;border-radius:50%;background:#2fcf86 }
+    button.primary { color:#fff; background:var(--blue); border:0; padding:10px 14px; border-radius:8px; font:600 13px inherit; cursor:pointer; box-shadow:0 7px 15px #3967ff33 } button.primary:hover { background:#2858ed }
+    .metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:15px; margin-bottom:22px }.card { background:var(--panel); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow); }
+    .metric { padding:17px 18px }.metric small { color:var(--muted); display:block; margin-bottom:8px }.metric-value { font-size:25px; font-weight:720; letter-spacing:-.04em }.metric-trend { font-size:12px; margin-left:5px; color:var(--green); font-weight:600 }.metric .sub { margin-top:5px; color:#8790a2; font-size:11px }
+    .grid { display:grid; grid-template-columns:1.52fr .9fr; gap:20px; align-items:start }.section { padding:20px }.section-head { display:flex; align-items:start; justify-content:space-between; margin-bottom:17px }.section-title { margin:0; font-size:15px; font-weight:700 }.section-desc { color:var(--muted); font-size:12px; margin-top:3px }.link { color:var(--blue); font-size:12px; font-weight:650; cursor:pointer; border:0; background:none; }
+    .askbox { border:1.5px solid #d9e0f0; background:#fbfcff; border-radius:10px; padding:11px; display:flex; gap:8px; margin-bottom:17px; transition:.2s }.askbox:focus-within { border-color:#6c8aff; box-shadow:0 0 0 3px #3967ff15 }.askbox input { border:0; background:transparent; outline:0; font:inherit; flex:1; min-width:0; color:var(--ink) }.send { border:0; width:32px; height:32px; border-radius:7px; background:var(--blue); color:#fff; cursor:pointer; font-size:16px }
+    .answer { border:1px solid #e5e8f0; border-radius:10px; padding:16px; background:#fff; min-height:130px }.answer-top { display:flex; justify-content:space-between; color:#6c7892; font-size:12px; margin-bottom:9px }.answer-body { font-size:14px; line-height:1.75 }.cite { color:var(--blue); background:var(--blue-weak); border-radius:4px; padding:1px 4px; font-weight:600; font-size:12px; white-space:nowrap }.answer-foot { color:#8790a1; font-size:11px; margin-top:13px; border-top:1px solid #edf0f5; padding-top:10px }
+    .sources { margin-top:16px; border-top:1px solid #edf0f5; padding-top:14px }.source-row { display:flex; gap:10px; padding:9px 0 }.source-icon { flex:0 0 29px; height:29px; border-radius:7px; background:#eff3ff; color:#5876e8; display:grid; place-items:center; font-size:13px }.source-name { font-size:12px; font-weight:650 }.source-meta { color:#8a93a4; font-size:11px; margin-top:1px }
+    .quality { padding:20px; margin-top:20px }.score-row { display:grid; grid-template-columns:128px 1fr 45px; align-items:center; gap:12px; margin:14px 0 }.score-label { font-size:12px; color:#46536d }.track { background:#edf0f6; height:7px; border-radius:99px; overflow:hidden }.fill { height:100%; border-radius:inherit; background:linear-gradient(90deg,#5576ff,#7893ff) }.score-num { text-align:right; font-size:12px; font-weight:700 }.quality-note { border-top:1px solid #edf0f5; color:#778198; font-size:11px; padding-top:13px; margin-top:14px }
+    .doc-list { display:grid; gap:8px }.doc { display:flex; align-items:center; gap:10px; padding:11px; border:1px solid #ebedf3; border-radius:9px; cursor:pointer; transition:.15s }.doc:hover,.doc.selected { border-color:#bdcbff; background:#f8faff }.doc-icon { width:31px; height:31px; display:grid; place-items:center; border-radius:7px; background:#fff2e2; color:#d97706 }.doc-title { font-size:12px; font-weight:670 }.doc-info { color:#8a93a4; font-size:11px; margin-top:2px }.doc-status { margin-left:auto; color:#0a9b6a; font-size:11px; font-weight:650 }.divider { height:1px;background:#edf0f5;margin:17px 0 }.trace { display:flex; align-items:center; justify-content:space-between; margin:11px 0; font-size:12px }.trace-id { color:#56647c; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:11px }.ok { color:#079567; background:#e8faf3; padding:2px 6px; border-radius:4px; font-size:11px; font-weight:700 }.bar-chart { height:80px; display:flex; align-items:end; gap:7px; padding:6px 0 0 }.bar { flex:1;background:#dfe7ff;border-radius:4px 4px 0 0; position:relative }.bar:last-child { background:#5576ff }.bar span { position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:10px;color:#9aa3b5 }
+    .toast { position:fixed; right:28px; bottom:24px; background:#162445; color:#fff; padding:12px 15px; border-radius:9px; box-shadow:0 13px 30px #14213d42; transform:translateY(100px); opacity:0; transition:.3s; font-size:13px }.toast.show { transform:none;opacity:1 }
+    @media(max-width:950px){.shell{grid-template-columns:70px 1fr}aside{padding:22px 10px}.brand span,.workspace,.nav span,.nav-label,.side-bottom{display:none}.brand{justify-content:center}.nav{justify-content:center;padding:11px}.dot{display:none}main{padding:22px}.metrics{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}} @media(max-width:580px){main{padding:18px 14px}.header-actions .pill{display:none}.metrics{grid-template-columns:1fr 1fr;gap:9px}.metric{padding:13px}.metric-value{font-size:21px}.grid{gap:13px}h1{font-size:21px}}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="brand"><div class="brand-mark">✦</div><span>Atlas Knowledge</span></div>
+      <div class="workspace"><span>ShopAssist · Production</span><span>⌄</span></div>
+      <div><div class="nav-label">Workspace</div><nav>
+        <button class="nav active"><span>▦</span><span>概览</span></button><button class="nav"><span>◫</span><span>知识库</span></button><button class="nav"><span>⌕</span><span>检索调试</span></button><button class="nav"><span>◌</span><span>评估中心</span></button>
+      </nav></div>
+      <div><div class="nav-label">Operations</div><nav>
+        <button class="nav"><span>◫</span><span>可观测性</span><i class="dot"></i></button><button class="nav"><span>⚙</span><span>设置</span></button>
+      </nav></div>
+      <div class="side-bottom">v0.1.0 · Demo environment<br/>Last index · just now</div>
+    </aside>
+    <main>
+      <header><div><div class="crumb">知识库 / 概览</div><h1>企业知识库控制台</h1></div><div class="header-actions"><div class="pill"><i></i> 索引服务正常</div><button class="primary" id="ingest">＋ 上传文档</button></div></header>
+      <section class="metrics">
+        <div class="card metric"><small>已索引文档</small><span class="metric-value">128</span><span class="metric-trend">+12 本周</span><div class="sub">1,842 个知识片段</div></div>
+        <div class="card metric"><small>检索 Recall@5</small><span class="metric-value">94.2%</span><span class="metric-trend">↑ 2.1%</span><div class="sub">黄金集 · 200 个问题</div></div>
+        <div class="card metric"><small>回答引用率</small><span class="metric-value">98.6%</span><span class="metric-trend">↑ 0.8%</span><div class="sub">近 7 天的问答请求</div></div>
+        <div class="card metric"><small>P95 响应延迟</small><span class="metric-value">1.24<span style="font-size:14px">s</span></span><span class="metric-trend" style="color:var(--green)">健康</span><div class="sub">目标：≤ 2.0 秒</div></div>
+      </section>
+      <div class="grid">
+        <div>
+          <section class="card section"><div class="section-head"><div><h2 class="section-title">问答工作台</h2><div class="section-desc">回答仅基于检索到的资料，并保留可追溯引用</div></div><button class="link" id="reset">重置示例</button></div>
+            <div class="askbox"><input id="question" value="退货申请期限是多久？" aria-label="提问" /><button class="send" id="ask" aria-label="发送问题">↑</button></div>
+            <div class="answer"><div class="answer-top"><span>基于 2 个知识片段生成</span><span id="latency">842 ms</span></div><div class="answer-body" id="answer">签收后的 <b>30 天内</b>，可以在订单详情中提交退货申请。商品应保持完好；审核通过后，客服会发送退货地址。 <span class="cite">[1]</span></div><div class="answer-foot">✓ 已完成证据校验 · 仅使用当前租户可访问的文档</div></div>
+            <div class="sources"><div class="section-desc" style="margin-bottom:5px">引用来源</div><div class="source-row"><div class="source-icon">▤</div><div><div class="source-name">退货政策 <span class="cite">[1]</span></div><div class="source-meta">第 1 段 · 匹配分数 0.94 · 2026-11-19 已索引</div></div></div><div class="source-row"><div class="source-icon">▤</div><div><div class="source-name">物流帮助 <span class="cite">[2]</span></div><div class="source-meta">第 1 段 · 匹配分数 0.41 · 2026-11-19 已索引</div></div></div></div>
+          </section>
+          <section class="card quality"><div class="section-head"><div><h2 class="section-title">评估中心</h2><div class="section-desc">黄金测试集最新运行结果 · 2026-11-19 10:24</div></div><button class="link">查看报告 →</button></div><div class="score-row"><div class="score-label">Recall@5</div><div class="track"><div class="fill" style="width:94.2%"></div></div><div class="score-num">94.2%</div></div><div class="score-row"><div class="score-label">MRR@5</div><div class="track"><div class="fill" style="width:89.7%"></div></div><div class="score-num">0.897</div></div><div class="score-row"><div class="score-label">答案关键词覆盖</div><div class="track"><div class="fill" style="width:91.5%"></div></div><div class="score-num">91.5%</div></div><div class="score-row"><div class="score-label">引用率</div><div class="track"><div class="fill" style="width:98.6%"></div></div><div class="score-num">98.6%</div></div><div class="quality-note">200 个人工标注问题 · 8 个失败案例待复核。指标用于发现问题，不将“有引用”当作回答事实正确。</div></section>
+        </div>
+        <div>
+          <section class="card section"><div class="section-head"><div><h2 class="section-title">知识库状态</h2><div class="section-desc">当前租户：ShopAssist</div></div><button class="link">管理 →</button></div><div class="doc-list"><div class="doc selected"><div class="doc-icon">▤</div><div><div class="doc-title">退货政策</div><div class="doc-info">Markdown · 3 chunks · 1.2 KB</div></div><div class="doc-status">已索引</div></div><div class="doc"><div class="doc-icon">▤</div><div><div class="doc-title">物流帮助</div><div class="doc-info">Markdown · 2 chunks · 0.8 KB</div></div><div class="doc-status">已索引</div></div><div class="doc"><div class="doc-icon" style="background:#ebfbf5;color:#159b6b">▤</div><div><div class="doc-title">售后服务规范</div><div class="doc-info">PDF · 17 chunks · 486 KB</div></div><div class="doc-status">已索引</div></div></div></section>
+          <section class="card section" style="margin-top:20px"><div class="section-head"><div><h2 class="section-title">可观测性</h2><div class="section-desc">近 24 小时请求走势</div></div><button class="link">追踪 →</button></div><div class="bar-chart"><div class="bar" style="height:31%"><span>00</span></div><div class="bar" style="height:44%"><span>04</span></div><div class="bar" style="height:63%"><span>08</span></div><div class="bar" style="height:48%"><span>12</span></div><div class="bar" style="height:81%"><span>16</span></div><div class="bar" style="height:60%"><span>20</span></div><div class="bar" style="height:75%"><span>Now</span></div></div><div class="divider"></div><div class="trace"><span class="trace-id">tr_9ac7…e21d</span><span>问答 · 842 ms</span><span class="ok">OK</span></div><div class="trace"><span class="trace-id">tr_f1b8…4a0c</span><span>文档入库 · 126 ms</span><span class="ok">OK</span></div><div class="trace"><span class="trace-id">tr_c29e…098a</span><span>问答 · 1.14 s</span><span class="ok">OK</span></div></section>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script>
+    const questions = { '物流': ['订单发货后，可以在订单详情页面查看物流单号和运输状态。若超过 7 天没有物流更新，请联系客服。 <span class="cite">[2]</span>', '1.02 s'], '退货': ['签收后的 <b>30 天内</b>，可以在订单详情中提交退货申请。商品应保持完好；审核通过后，客服会发送退货地址。 <span class="cite">[1]</span>', '842 ms'] };
+    const answer = document.getElementById('answer'), latency = document.getElementById('latency'), input = document.getElementById('question'), toast = document.getElementById('toast');
+    function notify(text){toast.textContent=text;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2300)}
+    function run(){ const key=Object.keys(questions).find(k=>input.value.includes(k)) || '退货'; answer.style.opacity=.35; setTimeout(()=>{answer.innerHTML=questions[key][0];latency.textContent=questions[key][1];answer.style.opacity=1;notify('已完成检索并生成带引用回答');},320) }
+    document.getElementById('ask').onclick=run; input.addEventListener('keydown',e=>{if(e.key==='Enter')run()});document.getElementById('reset').onclick=()=>{input.value='退货申请期限是多久？';run()};document.getElementById('ingest').onclick=()=>notify('演示模式：上传流程将在连接 API 后启用');
+  </script>
+</body>
+</html>
