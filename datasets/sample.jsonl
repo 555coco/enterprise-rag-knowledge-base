@@ -1,0 +1,2 @@
+{"question":"退货申请期限是多久？","expected_title":"退货政策","answer_contains":["30天"]}
+{"question":"订单发货后怎么查询物流？","expected_title":"物流帮助","answer_contains":["订单详情"]}
